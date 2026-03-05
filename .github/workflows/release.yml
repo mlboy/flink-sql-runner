@@ -9,6 +9,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 读写 Release（获取已有 Release、上传 JAR 资产）所必需
     steps:
       - name: Checkout
         uses: actions/checkout@v4
