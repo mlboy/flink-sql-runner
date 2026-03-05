@@ -1,0 +1,36 @@
+# 创建 Release 时（打 tag 如 v1.0.0）自动构建并上传 JAR 到 Release 页面，便于直接下载
+name: Release JAR
+
+on:
+  push:
+    tags:
+      - "v*"  # 例如 v1.0.0, v1.0.1
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: "11"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release and Upload JAR
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/flink-sql-runner-*.jar
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
