@@ -23,7 +23,7 @@
 ### 本地构建
 
 ```bash
-# 需要 JDK 11+ 和 Maven 3.6+
+# 需要 JDK 8+ 和 Maven 3.6+
 mvn clean package -DskipTests
 
 # 产物位于
