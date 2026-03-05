@@ -18,7 +18,7 @@
 ### 从 GitHub 下载（推荐）
 
 - **每次 push/PR 构建**：打开仓库 **Actions** 页，进入最新一次 “Build and Publish JAR” 运行，在页面底部 **Artifacts** 区下载 `flink-sql-runner-jar`。
-- **Release 版本**：在 **Releases** 页选择版本（如 `v1.0.0`），直接下载附件中的 `flink-sql-runner-*.jar`。
+- **Release 版本**：在 **Releases** 页先创建 Release（选择或新建 tag，如 `v1.0.0`，再点 Publish），CI 会自动构建并把 JAR 上传到该 Release；之后在对应版本下即可下载 `flink-sql-runner-*.jar`。
 
 ### 本地构建
 

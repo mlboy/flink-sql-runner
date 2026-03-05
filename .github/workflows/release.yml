@@ -1,10 +1,10 @@
-# 创建 Release 时（打 tag 如 v1.0.0）自动构建并上传 JAR 到 Release 页面，便于直接下载
+# 在「创建 Release」时触发，构建后向该 Release 上传 JAR（不在此 workflow 里创建 Release，避免权限问题）
+# 使用方式：在 GitHub 仓库 Releases 页 → Create new release → 选择或新建 tag（如 v1.0.0）→ 填写标题/说明 → Publish release → 本 workflow 自动构建并上传 JAR
 name: Release JAR
 
 on:
-  push:
-    tags:
-      - "v*"  # 例如 v1.0.0, v1.0.1
+  release:
+    types: [published, created]
 
 jobs:
   release:
@@ -25,14 +25,15 @@ jobs:
 
       - name: Prepare JAR for Release
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION=${TAG#v}
           cp target/flink-sql-runner-*.jar "flink-sql-runner-${VERSION}.jar"
           echo "JAR_PATH=flink-sql-runner-${VERSION}.jar" >> $GITHUB_ENV
 
-      - name: Create Release and Upload JAR
-        uses: softprops/action-gh-release@v2
+      # 向已存在的 Release 上传 JAR（使用 v1 仅上传资产，不创建 Release）
+      - name: Upload JAR to GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
           files: ${{ env.JAR_PATH }}
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
