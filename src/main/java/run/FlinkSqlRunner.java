@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,13 +69,15 @@ public final class FlinkSqlRunner {
         if (lastJob[0] != null) {
             try {
                 lastJob[0].getJobExecutionResult().get();
-            } catch (ExecutionException e) {
-                Throwable cause = e.getCause();
+            } catch (Throwable t) {
                 // Web Submission / detached 模式下不支持 getJobExecutionResult，任务已提交成功，直接退出
-                if (cause != null && isWebSubmissionUnsupported(cause)) {
+                if (isWebSubmissionUnsupported(t)) {
                     return;
                 }
-                throw new RuntimeException(e);
+                if (t instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                throw new RuntimeException(t);
             }
         }
     }
